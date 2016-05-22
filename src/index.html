@@ -3,19 +3,69 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
-		<title> Hello World!</title>
 	</head>
-	<body>
-		<div id="contain">
-			<div id="mainPage">
-				<h1>Hello World</h1>
-				Node    : <script>document.write(process.versions.node)</script><br/>
-				Chrome  : <script>document.write(process.versions.chrome)</script><br/>
-				Electron: <script>document.write(process.versions.electron)</script><br/>
+	<body style='height:100%;width:100%'>
+		<div style='height:100%;width:100%'>
+			<div id="info" style='height:20px;width:100%'>
+				Node    : <script>document.write(process.versions.node)</script>
+				Chrome  : <script>document.write(process.versions.chrome)</script>
+				Electron: <script>document.write(process.versions.electron)</script>
 			</div>
-			<div id="consolePrint">
+			<div id="contain">
 				
 			</div>
 		</div>
 	</body>
+	<script>window.$ = window.jQuery = require('./js/jquery-2.2.4.min.js');</script>
+	<script>
+	const I='i';
+	const ipc = require('electron').ipcRenderer;
+	const fs = require('fs');
+	function pd(p1,p2,p3) //print debug
+	{
+		let msg;
+		let isWarn=false;
+		switch(p1){
+			case 'error':
+			case 'e':
+			case 'err':
+				console.error(msg);
+				return;
+				break;
+			case 'information':
+			case 'i':
+			case 'info':
+				msg=p2;
+				break;
+			case 'warn':
+			case 'w':
+				isWarn=true;
+				msg=p2;
+				break;
+			default:
+				msg=p1;
+				break;
+		}
+		if(isWarn){
+			console.warn(msg);
+		}
+		else{
+			if(typeof(msg)==='string'){
+				console.log(msg);
+			}
+			else{
+				console.log(msg);
+			}
+		}
+	}
+	
+	$('#info').click(function(){
+		pd('i','info clicked; start');
+		ipc.send('open-file-dialog');
+		pd('i','info clicked; end');
+	});
+	ipc.on('selected-directory', function (event, path) {
+		pd(I,"path="+path[0]);
+	});
+	</script>
 </html>

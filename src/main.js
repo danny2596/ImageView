@@ -12,26 +12,16 @@ function createWindow () {
 	mainWindow = new BrowserWindow({width: 1280, height: 720});
 	mainWindow.loadURL('file://' + __dirname + '/index.html');
 	mainWindow.webContents.openDevTools();
+	
+	//add window event
 	mainWindow.on('closed', function () {
 		mainWindow = null;
 	});
-}
-function pd(p1,p2,p3) //print debug
-{
-	let type = 1;
 	
-	
-	switch(type){
-		case 1:
-			break;
-		case 2:
-			break
-		case 3:
-			break
-		case 4:
-			break
-	}
 }
+
+
+//add app events
 app.on('ready', createWindow);
 app.on('window-all-closed', function () {
 	if (process.platform !== 'darwin') {
@@ -43,4 +33,16 @@ app.on('activate', function () {
 		createWindow();
 	}
 });
+
+//open file,dir dialog
+const ipc = require('electron').ipcMain
+const dialog = require('electron').dialog
+ipc.on('open-file-dialog', function (event) {
+	dialog.showOpenDialog(
+		{properties: ['openDirectory']}, 
+		function (files) {
+			if (files) event.sender.send('selected-directory', files)
+		}
+	);
+})
 
