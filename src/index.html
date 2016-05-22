@@ -17,47 +17,10 @@
 		</div>
 	</body>
 	<script>window.$ = window.jQuery = require('./js/jquery-2.2.4.min.js');</script>
+	<script src='./js/util.js'></script>
+	<script src='./js/processFile.js'></script>
 	<script>
-	const I='i';
 	const ipc = require('electron').ipcRenderer;
-	const fs = require('fs');
-	function pd(p1,p2,p3) //print debug
-	{
-		let msg;
-		let isWarn=false;
-		switch(p1){
-			case 'error':
-			case 'e':
-			case 'err':
-				console.error(msg);
-				return;
-				break;
-			case 'information':
-			case 'i':
-			case 'info':
-				msg=p2;
-				break;
-			case 'warn':
-			case 'w':
-				isWarn=true;
-				msg=p2;
-				break;
-			default:
-				msg=p1;
-				break;
-		}
-		if(isWarn){
-			console.warn(msg);
-		}
-		else{
-			if(typeof(msg)==='string'){
-				console.log(msg);
-			}
-			else{
-				console.log(msg);
-			}
-		}
-	}
 	
 	$('#info').click(function(){
 		pd('i','info clicked; start');
@@ -69,49 +32,5 @@
 		readDir(path[0]);
 	});
 	
-	function readDir(path){
-		let files ={};
-		files.dirArr=[]
-		files.fileArr=[];
-		files.dirPath=path;
-		let list;
-		try{
-			list = fs.readdirSync(path);
-		}catch(e){
-			pd('e','readDir error:'+e.message);
-			return;
-		}
-		if(list === null || list === undefined)
-			return;
-			
-		let fullPath;
-		let fileStat;	
-		let file;
-		for(let obj in list){
-			file=list[obj];
-			pd(I,'process '+file);
-			fullPath = path+'\\' + file;
-			try{
-				if(fs.existsSync(fullPath)){
-					fileStat = fs.statSync(path+'\\' + file);
-					if(fileStat.isFile()){
-						pd(I,file+' is File');
-						files.fileArr.push(file);
-					}else if(fileStat.isDirectory()){
-						pd(I,file+' is Dir');
-						files.dirArr.push(file);
-					}else{
-						pd(I,file+' is not a file or dir');
-					}
-				}else{
-					pd(I,file+' is not exisits');
-				}
-			}
-			catch(e){
-				pd('e','process '+fullPath+' error:'+e.message)
-			}
-		}
-		return files;
-	}
 	</script>
 </html>
