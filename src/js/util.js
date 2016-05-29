@@ -7,7 +7,7 @@ function pd(p1,p2,p3) //print debug
 		case 'error':
 		case 'e':
 		case 'err':
-			console.error(msg);
+			console.error(p2);
 			return;
 			break;
 		case 'information':

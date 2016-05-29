@@ -1,5 +1,10 @@
 const fs = require('fs');
 
+/**
+ * readDir use node.js model fs to read file/dir and return instance
+ * @param  {[type]}
+ * @return {dirArr:[],fileArr[],dirPath:string}
+ */
 function readDir(path){
 	let files ={};
 	files.dirArr=[]
@@ -42,5 +47,21 @@ function readDir(path){
 			pd('e','process '+fullPath+' error:'+e.message)
 		}
 	}
+	files.dirArr.sort();
+	files.fileArr.sort();
 	return files;
+}
+
+function winPath2FileURL(path){
+	if(typeof(path)!=='string')
+		return "";
+	path.replace(/\\/g, "/");
+	return 'file://'+path;
+}
+function getParentPath(path){
+	let pathArr = dir.dirPath.split('\\');
+	if(pathArr.length<2){
+		return null;
+	}
+	
 }

@@ -4,12 +4,23 @@
 	<head>
 		<meta charset="UTF-8">
 	</head>
-	<body style='height:100%;width:100%'>
+	<style type="text/css">
+		.span-btn{
+			width: 10%;
+			display: inline-block;
+			border-color: black;
+			border-width: 1px;
+			border-style: outset;
+			text-align: center;
+		}
+	</style>
+	<body style='height:100%;width:100%; margin:0 0 0 0;'>
 		<div style='height:100%;width:100%'>
-			<div id="info" style='height:20px;width:100%'>
-				Node    : <script>document.write(process.versions.node)</script>
-				Chrome  : <script>document.write(process.versions.chrome)</script>
-				Electron: <script>document.write(process.versions.electron)</script>
+			<div id="info" style='height:20px;width:100%; margin-top: 5px;margin-bottom: 5px'>
+				<span style="width:65%; display: inline-block; border: 1px solid black; margin-left: 5px; padding-left:3px;">info</span>
+				<span class='span-btn' onclick="ipc.send('open-file-dialog');" >OpenDir</span>
+				<span class='span-btn' onclick='changeWorkingMode("pic");'>ViewPic</span>
+				<span class='span-btn' onclick='changeWorkingMode("rename");'>Rename</span>
 			</div>
 			<div id="contain">
 				
@@ -20,17 +31,66 @@
 	<script src='./js/util.js'></script>
 	<script src='./js/processFile.js'></script>
 	<script>
-	const ipc = require('electron').ipcRenderer;
-	
-	$('#info').click(function(){
-		pd('i','info clicked; start');
-		ipc.send('open-file-dialog');
-		pd('i','info clicked; end');
-	});
-	ipc.on('selected-directory', function (event, path) {
-		pd(I,"path="+path[0]);
-		readDir(path[0]);
-	});
-	
+		//variable
+		var gDir;
+		var workingMode="pic";
+	</script>
+	<script>
+		//events
+		$(document).ready(function(){
+			pd(I,"@index.html >> document ready");
+			changeWorkingMode("pic");
+		});
+		$(window).resize(function() {
+			pd(I,"@index.html >> window resize");
+			try{
+				onWindowResize();
+			}catch(e){}
+		});
+		$(document).on('keydown', function (event) {
+			pd(I,"@pic.html > keydown fired, keycode="+event.keyCode);
+			try{
+				onKeydownEvent(event.keyCode);
+			}catch(e){}
+		});
+	</script>
+	<script>
+		// about open dir
+		const ipc = require('electron').ipcRenderer;
+		ipc.on('selected-directory', function (event, path) {
+			pd(I,"path="+path[0]);
+			let dirData = readDir(path[0]);
+			openRootDir(dirData);
+		});
+	</script>
+	<script>
+		//functions
+		function changeWorkingMode(mode){
+			pd(I,"clicked mode="+mode);
+			pd(I,"workingMode="+workingMode);
+			try{
+				onDestroy();
+			}catch(e){}
+
+			//remove functions
+			onDestroy=null;
+			onInit=null;
+			onWindowResize=null;
+			onKeydownEvent=null;
+
+			//empty div
+			var ct = $("#contain");
+			ct.empty();
+
+			//load new page
+			let path='./page/'+mode+".html";
+			ct.load(path,function(){
+				pd(I,'ct load success');
+				try{
+					onInit();
+					openRootDir();
+				}catch(e){}
+			});
+		}
 	</script>
 </html>

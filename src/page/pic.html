@@ -1,0 +1,78 @@
+<style>
+	.pic-filter{
+		width: 100%;
+		text-align: center;
+		background: black;
+		overflow: hidden;
+	}
+	.pic-load-img{
+		height: 100%;
+	}
+</style>
+<div class='pic-filter'>
+	<img src="file://C:/Users/Danny/Documents/Test File/新增資料夾/Cover.jpg" alt="" class='pic-load-img' >
+</div>
+<script>
+	
+	function onInit(){
+		onWindowResize();
+
+	}
+	function onWindowResize(){
+		pd(I,"@pic.html >> onWindowResize Start");
+		let winH= window.innerHeight;
+		$('.pic-filter').css('height',winH-30);
+		pd(I,"@pic.html >> onWindowResize end");
+	}
+	function onDestroy(){
+
+	}
+	function openRootDir(obj){
+		let dir;
+		pd("i","@pic.html > openRootDir start, typeof obj="+typeof(obj));
+		if(obj === undefined){
+			if( typeof(gDir) === 'undefined' )
+				return;
+			else
+				dir=gDir;
+		}else{
+			dir=obj;
+		}
+		pd(I,"@pic.html > openRootDir > open book, root dirArr.length="+dir.dirArr.length);
+
+		try{
+			if(dir.dirArr.length>0){
+				let bookPath=dir.dirPath+"\\"+dir.dirArr[0];
+				dir.currDir=0;
+				pd(I,"@pic.html > openRootDir > open book="+bookPath);
+				let book = readDir(bookPath);
+				pd(I,"@pic.html > openRootDir > open book >> dir length="+book.dirArr.length+", file length="+book.fileArr.length);
+			}else{
+				//get parent dir
+				getParentPath();
+				//set up gDir
+
+				//openBook
+				openBook(dir);
+			}
+		}catch(e){
+			pd('e',"@pic.html > openRootDir > open book ERROR : "+e.message);
+		}
+	}
+	function openBook(dir){
+
+		//1. check is nature sort
+
+		//2. check has dir insite
+
+		//3. show info message
+
+	}
+	function preBook(){
+		pd(I,"@pic.html > preBook start");
+	}
+	function nextBook(){
+
+	}
+	
+</script>
