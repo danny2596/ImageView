@@ -16,8 +16,8 @@
 	</style>
 	<body style='height:100%;width:100%; margin:0 0 0 0;'>
 		<div style='height:100%;width:100%'>
-			<div id="info" style='height:20px;width:100%; margin-top: 5px;margin-bottom: 5px'>
-				<span style="width:65%; display: inline-block; border: 1px solid black; margin-left: 5px; padding-left:3px;">info</span>
+			<div style='height:20px;width:100%; margin-top: 5px;margin-bottom: 5px'>
+				<span id="info" style="width:65%; display: inline-block; border: 1px solid black; margin-left: 5px; padding-left:3px;">info</span>
 				<span class='span-btn' onclick="ipc.send('open-file-dialog');" >OpenDir</span>
 				<span class='span-btn' onclick='changeWorkingMode("pic");'>ViewPic</span>
 				<span class='span-btn' onclick='changeWorkingMode("rename");'>Rename</span>
@@ -30,6 +30,7 @@
 	<script>window.$ = window.jQuery = require('./js/jquery-2.2.4.min.js');</script>
 	<script src='./js/util.js'></script>
 	<script src='./js/processFile.js'></script>
+	<script src='./js/alphanum.js'></script>
 	<script>
 		//variable
 		var gDir;
@@ -48,7 +49,7 @@
 			}catch(e){}
 		});
 		$(document).on('keydown', function (event) {
-			pd(I,"@pic.html > keydown fired, keycode="+event.keyCode);
+			pd(I,"@index.html > keydown fired, keycode="+event.keyCode);
 			try{
 				onKeydownEvent(event.keyCode);
 			}catch(e){}
@@ -60,7 +61,7 @@
 		ipc.on('selected-directory', function (event, path) {
 			pd(I,"path="+path[0]);
 			let dirData = readDir(path[0]);
-			openRootDir(dirData);
+			dirOpened(dirData);
 		});
 	</script>
 	<script>
@@ -88,7 +89,7 @@
 				pd(I,'ct load success');
 				try{
 					onInit();
-					openRootDir();
+					dirOpened();
 				}catch(e){}
 			});
 		}

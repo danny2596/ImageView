@@ -25,30 +25,30 @@ function readDir(path){
 	let file;
 	for(let obj in list){
 		file=list[obj];
-		pd(I,'process '+file);
+		if(typeof(file) !== 'string')
+			continue;
+
 		fullPath = path+'\\' + file;
 		try{
 			if(fs.existsSync(fullPath)){
 				fileStat = fs.statSync(path+'\\' + file);
 				if(fileStat.isFile()){
-					pd(I,file+' is File');
 					files.fileArr.push(file);
 				}else if(fileStat.isDirectory()){
-					pd(I,file+' is Dir');
 					files.dirArr.push(file);
 				}else{
-					pd(I,file+' is not a file or dir');
+					pd(I,"@processFile.js > readDir,"+file+' is not a file or dir');
 				}
 			}else{
-				pd(I,file+' is not exisits');
+				pd(I,"@processFile.js > readDir,"+file+' is not exisits');
 			}
 		}
 		catch(e){
-			pd('e','process '+fullPath+' error:'+e.message)
+			pd('e',"@processFile.js > readDir, process "+fullPath+' error:'+e.message)
 		}
 	}
-	files.dirArr.sort();
-	files.fileArr.sort();
+	files.dirArr.alphanumSort();
+	files.fileArr.alphanumSort();
 	return files;
 }
 
@@ -59,9 +59,43 @@ function winPath2FileURL(path){
 	return 'file://'+path;
 }
 function getParentPath(path){
-	let pathArr = dir.dirPath.split('\\');
+	pd(I,"@processFile > getParentPath; start, path="+path);
+	let pathArr = path.split('\\');
 	if(pathArr.length<2){
 		return null;
 	}
-	
+	let res="";
+	let i=0;
+	for(i=0;i<pathArr.length-1;i++){
+		res = res + pathArr[i]+"\\";
+	}
+	pd(I,"@processFile > getParentPath; return="+res);
+	return res;
+}
+
+function getName(path){
+	pd(I,"@processFile > getName; start, path="+path);
+	let pathArr = path.split('\\');
+	if(pathArr.length<1){
+		return null;
+	}
+	if(pathArr[pathArr.length-1].length>0){
+		pd(I,"@processFile > getName; (1) return="+pathArr[pathArr.length-1]);
+		return pathArr[pathArr.length-1];
+	}else{
+		pd(I,"@processFile > getName; (2) return="+pathArr[pathArr.length-2]);
+		return pathArr[pathArr.length-2];
+	}
+}
+function isImage(name){
+	if(typeof(name) !== 'string'){
+		pd(I,'@processFile > isImage; name is not a string');
+		return false;
+	}
+	let r = name.toLowerCase().search("\\.jpg$|\\.png$|\\.bmp$|\\.jpeg$");
+	pd(I,'@processFile > isImage; name='+name+", r="+r);
+	if(r>=0)
+		return true;
+	else
+		return false;
 }

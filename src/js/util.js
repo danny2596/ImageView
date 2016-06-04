@@ -36,3 +36,16 @@ function pd(p1,p2,p3) //print debug
 		}
 	}
 }
+
+function stringArrayCmp(a,b){
+	if(a.length !== b.length){
+		return false;
+	}
+	for(let i=0;i<a.length;i++){
+		pd(I,"cmp a="+a[i]+", b="+b[i]);
+		if(a[i]!==b[i]){
+			return false;
+		}
+	}
+	return true;
+}
