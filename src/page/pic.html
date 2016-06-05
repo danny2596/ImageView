@@ -42,7 +42,6 @@
 	}
 </style>
 <div class='pic-filter' id="pic-filter">
-	<img src="file://C:/Users/Danny/Documents/Test File/新增資料夾/Cover.jpg" alt="" class='pic-load-img' >
 </div>
 <script>
 	var currBook;
@@ -61,6 +60,7 @@
 				dir=gDir;
 		}else{
 			dir=obj;
+			gDir=dir;
 		}
 		if(openMode===0)
 			openRootDir(dir);
@@ -90,7 +90,7 @@
 
 		try{
 			if(dir.dirArr.length>0 && dir.fileArr.length===0){
-				let bookPath=dir.dirPath+"\\"+dir.dirArr[0];
+				let bookPath=dir.dirPath+dir.dirArr[0];
 				dir.currDir=0;
 				let book = readDir(bookPath);
 				openBook(book);
@@ -160,6 +160,7 @@
 
 		//6.show image
 		currBook.currFile=0;
+		startTime=0;
 		if(currBook.fileArr.length>0)
 			showImg();
 	}
@@ -183,7 +184,7 @@
 		}
 		pd(I,"@pic.html >> showImg, img path="+imgPath);
 		let imgstr="<img src='"+winPath2FileURL(imgPath)+"'>";
-
+		pd(I,"@pic.html >> showImg, imgstr="+imgstr);
 		let img=$(imgstr);
 		pd(I,"@pic.html >> showImg, create img elem");
 		img.css('display','none');
@@ -213,9 +214,36 @@
 	}
 	function prevBook(){
 		pd(I,"@pic.html > preBook start");
+		if(typeof(gDir)==='undefined' || typeof(gDir.currDir) === 'undefined')
+		{
+			pd(I,'@pic.html > prebook ; gDir or gDir.currDir is undefined')
+			return;
+		}
+		if(gDir.currDir===0){
+			alert('No Prev Book');
+			return;
+		}
+		gDir.currDir--;
+		let bookPath = gDir.dirPath+gDir.dirArr[gDir.currDir];
+		pd(I,'@pic.html > prevBook ; bookPath = '+bookPath);
+		openBook(readDir(bookPath));
 	}
 	function nextBook(){
 		pd(I,"@pic.html > nextBook start");
+		if(typeof(gDir)==='undefined' || typeof(gDir.currDir) === 'undefined')
+		{
+			pd(I,'@pic.html > nextBook ; gDir or gDir.currDir is undefined')
+			return;
+		}
+
+		if(gDir.currDir===gDir.dirArr.length-1){
+			alert('No Next Book');
+			return;
+		}
+		gDir.currDir++;
+		let bookPath = gDir.dirPath+gDir.dirArr[gDir.currDir];
+		pd(I,'@pic.html > nextBook ; bookPath = '+bookPath);
+		openBook(readDir(bookPath));
 	}
 	function prevPage(){
 		pd(I,"@pic.html > prevPage start");
@@ -225,7 +253,7 @@
 		if(currBook.currFile === -1){
 			currBook.currFile++;
 			pd(I,"@pic.html > prevPage; no prev Page");
-
+			alert('No Prev Page');
 			return;
 		}
 		$('#book-info').text(currBook.bookName+' ['+(currBook.currFile+1)+'/'+currBook.fileArr.length+']');
@@ -241,7 +269,7 @@
 		if(currBook.currFile === currBook.fileArr.length){
 			currBook.currFile--;
 			pd(I,"@pic.html > nextPage; no next Page");
-
+			alert('No Next Page');
 			return;
 		}
 		$('#book-info').text(currBook.bookName+' ['+(currBook.currFile+1)+'/'+currBook.fileArr.length+']');
@@ -251,13 +279,30 @@
 		pd(I,"@pic.html > firstPage start");
 		if(typeof(currBook)==='undefined' || typeof(currBook.currFile) === 'undefined')
 			return;
+		currBook.currFile=0;
+		$('#book-info').text(currBook.bookName+' ['+(currBook.currFile+1)+'/'+currBook.fileArr.length+']');
+		showImg();
 	}
 	function lastPage(){
 		pd(I,"@pic.html > lastPage start");
 		if(typeof(currBook)==='undefined' || typeof(currBook.currFile) === 'undefined')
 			return;
+		currBook.currFile=currBook.fileArr.length-1;
+		$('#book-info').text(currBook.bookName+' ['+(currBook.currFile+1)+'/'+currBook.fileArr.length+']');
+		showImg();
 	}
 	function deletePage(){
+		//copy src path and name
+		
+		//remove name form currBook.fileArr
+		
+		//check currfile is out of range or not
+		
+		//showImage()
+		
+		// process backup name
+		
+		//use fs move file to back dir
 		
 	}
 	function moveBook(target){
@@ -269,7 +314,33 @@
 		
 		//open book
 		
-		//use fs rename to target
+		//use fs move to target
+	}
+	function askTargetDirPath(mode){
+		if(openMode!==0)
+			return;
+		openMode=mode;
+		ipc.send('open-file-dialog');
+	}
+	function openMoveTarget(dir,mode){
+		//getted target dir
+		//save path.
+		let path = dir.dirPath;
+		pd(I,'@pic.html > locateTest > path:'+path);
+		if(path[path.length-1]==='\\')
+			moveTarget[mode]=path;
+		else
+			moveTarget[mode]=path+'\\';
+	}
+	function locateTest(){
+		alert("this is alert");
+		try{
+			let path = __dirname;
+			pd(I,'@pic.html > locateTest > path:'+path);
+		}catch(e){
+			pd('e','@pic.html > locateTest > ERROR:'+e.message);
+		}
+
 	}
 	function onKeydownEvent(key){
 		
@@ -284,6 +355,7 @@
 				break;
 			case 37:
 				//left
+				locateTest();
 				break;
 			case 39:
 				//right
@@ -314,29 +386,32 @@
 				break;
 			case 46:
 				//delete
+				deletePage();
 				break;
 			case 49:
 				//1
+				askTargetDirPath(1);
 				break;
 			case 50:
 				//2
+				askTargetDirPath(2);
 				break;
 			case 51:
 				//3
+				askTargetDirPath(3);
 				break;
 			case 81:
 				//q
+				moveBook(1);
 				break;
 			case 87:
 				//w
+				moveBook(2);
 				break;
 			case 69:
 				//e
+				moveBook(3);
 				break;	
 		}
 	}//end of onKeydownEvent
-
-	function openMoveTarget(dir,mode){
-
-	}
 </script>

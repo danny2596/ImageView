@@ -55,8 +55,24 @@ function readDir(path){
 function winPath2FileURL(path){
 	if(typeof(path)!=='string')
 		return "";
-	path.replace(/\\/g, "/");
-	return 'file://'+path;
+	let res="file:///";
+	for(let i=0; i<path.length;i++){
+		switch(path[i]){
+			default:
+				res=res+path[i];
+				break;
+			case '\\':
+				res=res+'/';
+				break;
+			case '#':
+				res=res+'%23';
+				break;
+		}
+	}
+	//pd(I,"@processFile > winPath2FileURL; count="+count+", path.length="+path.length+", res="+res);
+	// path.replace(/\\/g, "/");
+	// return 'file:///'+path;
+	return res;
 }
 function getParentPath(path){
 	pd(I,"@processFile > getParentPath; start, path="+path);
@@ -93,7 +109,7 @@ function isImage(name){
 		return false;
 	}
 	let r = name.toLowerCase().search("\\.jpg$|\\.png$|\\.bmp$|\\.jpeg$");
-	pd(I,'@processFile > isImage; name='+name+", r="+r);
+	//pd(I,'@processFile > isImage; name='+name+", r="+r);
 	if(r>=0)
 		return true;
 	else

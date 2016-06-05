@@ -42,7 +42,7 @@ function stringArrayCmp(a,b){
 		return false;
 	}
 	for(let i=0;i<a.length;i++){
-		pd(I,"cmp a="+a[i]+", b="+b[i]);
+		//pd(I,"cmp a="+a[i]+", b="+b[i]);
 		if(a[i]!==b[i]){
 			return false;
 		}
