@@ -1,5 +1,7 @@
-const fs = require('fs');
-
+const fs = require('fs-extra');
+const NOT_EXISTS=0;
+const FILE=2;
+const DIRECTROY=3;
 /**
  * readDir use node.js model fs to read file/dir and return instance
  * @param  {[type]}
@@ -28,10 +30,10 @@ function readDir(path){
 		if(typeof(file) !== 'string')
 			continue;
 
-		fullPath = path+'\\' + file;
+		fullPath = mergePath(path,file);
 		try{
 			if(fs.existsSync(fullPath)){
-				fileStat = fs.statSync(path+'\\' + file);
+				fileStat = fs.statSync(fullPath);
 				if(fileStat.isFile()){
 					files.fileArr.push(file);
 				}else if(fileStat.isDirectory()){
@@ -114,4 +116,47 @@ function isImage(name){
 		return true;
 	else
 		return false;
+}
+function mergePath(a,b){
+	if(a[a.length-1]==='\\'){
+		return a+b;
+	}else{
+		return a+'\\'+b;
+	}
+}
+function checkStatus(path){
+	/*
+	const NOT_EXISTS=0;
+	const FILE=2;
+	const DIRECTROY=3;
+	 */
+	try{
+		if(fs.existsSync(path)){
+			fileStat = fs.statSync(path);
+			if(fileStat.isFile()){
+				return FILE;
+			}else if(fileStat.isDirectory()){
+				return DIRECTROY;
+			}else{
+				pd(I,"@processFile.js > checkStatus,"+path+' is not a file or dir');
+				return 'unknown';
+			}
+		}else{
+			pd(I,"@processFile.js > checkStatus,"+path+' is not exisits');
+			return NOT_EXISTS;
+		}
+	}
+	catch(e){
+		pd('e',"@processFile.js > checkStatus, process "+path+' error:'+e.message)
+		return 'error';
+	}
+}
+function moveDir(src,dst){
+	pd(I,"@processFile.js > moveDir start");
+	fs.move(src,dst,function(err){
+		if(err){
+			alert("move error")
+			pd('e','@processFile.js > move error : '+err);
+		}
+	});
 }

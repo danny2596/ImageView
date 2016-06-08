@@ -85,6 +85,8 @@
 
 			//load new page
 			let path='./page/'+mode+".html";
+			let jsPath='./js/'+mode+'.js'
+			$.getScript(jsPath);
 			ct.load(path,function(){
 				pd(I,'ct load success');
 				try{

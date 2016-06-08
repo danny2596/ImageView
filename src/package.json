@@ -1,5 +1,8 @@
 {
-	"name" : "imageView",
-	"version" : "0.0.1",
-	"main" : "main.js"
+  "name": "imageView",
+  "version": "0.0.1",
+  "main": "main.js",
+  "dependencies": {
+    "fs-extra": "^0.30.0"
+  }
 }
