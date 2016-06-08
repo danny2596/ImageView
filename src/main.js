@@ -11,12 +11,13 @@ let mainWindow;
 function createWindow () {
 	mainWindow = new BrowserWindow({width: 1280, height: 720});
 	mainWindow.loadURL('file://' + __dirname + '/index.html');
-	mainWindow.webContents.openDevTools();
 	
 	//add window event
 	mainWindow.on('closed', function () {
 		mainWindow = null;
 	});
+
+	//show
 	mainWindow.show();
 }
 
@@ -44,5 +45,8 @@ ipc.on('open-file-dialog', function (event) {
 			if (files) event.sender.send('selected-directory', files)
 		}
 	);
-})
+});
+ipc.on('open-devtool',function(){
+	mainWindow.webContents.openDevTools();
+});
 

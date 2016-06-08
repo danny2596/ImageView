@@ -51,8 +51,12 @@
 		$(document).on('keydown', function (event) {
 			pd(I,"@index.html > keydown fired, keycode="+event.keyCode);
 			try{
+				if(event.keyCode==67){
+					//c
+					ipc.send('open-devtool');
+				}
 				onKeydownEvent(event.keyCode);
-			}catch(e){}
+			}catch(e){pd('e',"@index.html > keydown fired, Error : "+e.message);}
 		});
 	</script>
 	<script>

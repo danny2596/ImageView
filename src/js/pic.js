@@ -335,12 +335,7 @@ function openMoveTarget(dir,mode){
 		moveTarget[mode]=path+'\\';
 }
 function locateTest(){
-	var r=confirm("confirm!!!");
-	if(r===true){
-		pd(I,'@pic.js > locateTest > confirm true');
-	}else{
-		pd(I,'@pic.js > locateTest > confirm false');
-	}
+	
 	try{
 		let path = __dirname;
 		pd(I,'@pic.js > locateTest > path:'+path);
@@ -419,5 +414,8 @@ function onKeydownEvent(key){
 			//e
 			moveBook(3);
 			break;	
+		case 27:
+			$('img').hide();
+			break;
 	}
 }//end of onKeydownEvent
