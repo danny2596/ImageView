@@ -69,6 +69,9 @@ function winPath2FileURL(path){
 			case '#':
 				res=res+'%23';
 				break;
+			case '\'':
+				res=res+'%27';
+				break;
 		}
 	}
 	//pd(I,"@processFile > winPath2FileURL; count="+count+", path.length="+path.length+", res="+res);

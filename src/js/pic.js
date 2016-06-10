@@ -23,21 +23,21 @@ function dirOpened(obj){
 	openMode=0;
 }
 function onWindowResize(){
-	pd(I,"@pic.js >> onWindowResize Start");
+	// pd(I,"@pic.js >> onWindowResize Start");
 	let winH= window.innerHeight;
 	let winW= window.innerWidth;
 	filterH = winH-30;
 	filterW=winW;
 	$('.pic-filter').css('height',filterH);
 	showImg();
-	pd(I,"@pic.js >> onWindowResize end");
+	// pd(I,"@pic.js >> onWindowResize end");
 }
 function onDestroy(){
 
 }
 function openRootDir(obj){
 	let dir=obj;
-	pd("i","@pic.js > openRootDir start");
+	// pd("i","@pic.js > openRootDir start");
 	
 	pd(I,"@pic.js > openRootDir > open book, root dirArr.length="+dir.dirArr.length+", fileArr.length="+dir.fileArr.length);
 
@@ -65,23 +65,29 @@ function openRootDir(obj){
 	}
 }
 function openBook(dir){
-	let msg = "";
+	let msg = [];
+	let bookName=getName(dir.dirPath);
+	let info = $('#info');
+
 	currBook=dir;
-	//1. check is nature sort
+	info.empty();
+	
+	// check is nature sort
 	let tmp = dir.fileArr.slice(0);
 	tmp.sort();
-	if(stringArrayCmp(tmp,dir.fileArr)){
-		pd(I,"@pic.js >> open book; equals");
+	if(!stringArrayCmp(tmp,dir.fileArr)){
+		let alpha=$("<div class='alpha'>Alpha</div>");
+		info.append(alpha);
+		msg.push("Using Alpha Sort");
 	}
-	else{
-		msg += "<div class='alpha'>Alpha</div>";
-		pd(I,"@pic.js >> open book; not equals");
-	}
-	//2. check has dir insite
+		
+	// check has dir insite
 	if(dir.dirArr.length>0){
-		msg+="<div class='subdir'>SubDIR</div>";
+		let subdir = $("<div class='subdir'>SubDIR</div>");
+		msg.push("Has Sub-Directory");
 	}
-	//3. remove non-image file
+
+	// remove non-image file
 	let imgOnly=[];
 	let hasNonImg=false;
 	for(let i=0;i<dir.fileArr.length;i++){
@@ -92,31 +98,34 @@ function openBook(dir){
 			hasNonImg=true;
 		}
 	}
+	
 	dir.fileArr=imgOnly;
+	dir.imgArr=imgOnly;
 	if(hasNonImg){
-		msg+="<div class='non-img'>NonImg</dev>";
+		let nonImg = $("<div class='non-img'>NonImg</dev>");
+		info.append(nonImg);
+		msg.push("Has Non-image file");
 	}
-	//4. put book info
+
+	// put book info
 	if(dir.fileArr.length===0){
-		msg+='<div class="bookinfo" id="book-info">NO IMAGE CAN SHOW</div>';
+		info.append('<div class="bookinfo" id="book-info">NO IMAGE CAN SHOW '+bookName+'</div>');
 	}
 	else{
-		let bookName=getName(dir.dirPath);
 		currBook.bookName=bookName;
-		msg+='<div class="bookinfo" id="book-info">'+bookName+' [1/'+dir.fileArr.length+']</div>';
-		msg+='<div class="bookinfo" id="uTime"></div>'
-	}
-	
-	//5. show info message
-	let info = $('#info');
-	info.empty();
-	info.append(msg);
+		info.append('<div class="bookinfo" id="book-info">'+bookName+' [1/'+dir.fileArr.length+']</div>');
+		info.append('<div class="bookinfo" id="uTime"></div>');
+	}	
 
-	//6.show image
+	//show image
 	currBook.currFile=0;
 	startTime=0;
 	if(currBook.fileArr.length>0)
 		showImg();
+
+	if(msg.length>0){
+		SW('Book',msg.join('\n'));
+	}
 }
 function showImg(){
 	pd(I,"@pic.js >> showImg, start");
@@ -131,11 +140,7 @@ function showImg(){
 	$('#pic-filter').empty();
 	pd(I,"@pic.js >> showImg, empty");
 	let imgPath=mergePath(currBook.dirPath,currBook.fileArr[currBook.currFile]);
-	// if(currBook.dirPath[currBook.dirPath.length-1]==='\\'){
-	// 	imgPath=currBook.dirPath+currBook.fileArr[currBook.currFile];
-	// }else{
-	// 	imgPath=currBook.dirPath+'\\'+currBook.fileArr[currBook.currFile];
-	// }
+	
 	pd(I,"@pic.js >> showImg, img path="+imgPath);
 	let imgstr="<img src='"+winPath2FileURL(imgPath)+"'>";
 	pd(I,"@pic.js >> showImg, imgstr="+imgstr);
@@ -174,7 +179,7 @@ function prevBook(){
 		return;
 	}
 	if(gDir.currDir===0){
-		alert('No Prev Book');
+		SW('No Prev Book');
 		return;
 	}
 	gDir.currDir--;
@@ -191,7 +196,7 @@ function nextBook(){
 	}
 
 	if(gDir.currDir===gDir.dirArr.length-1){
-		alert('No Next Book');
+		SW('No Next Book');
 		return;
 	}
 	gDir.currDir++;
@@ -207,7 +212,7 @@ function prevPage(){
 	if(currBook.currFile === -1){
 		currBook.currFile++;
 		pd(I,"@pic.js > prevPage; no prev Page");
-		alert('No Prev Page');
+		SW('No Prev Page');
 		return;
 	}
 	$('#book-info').text(currBook.bookName+' ['+(currBook.currFile+1)+'/'+currBook.fileArr.length+']');
@@ -223,7 +228,7 @@ function nextPage(){
 	if(currBook.currFile === currBook.fileArr.length){
 		currBook.currFile--;
 		pd(I,"@pic.js > nextPage; no next Page");
-		alert('No Next Page');
+		SW('No Next Page');
 		return;
 	}
 	$('#book-info').text(currBook.bookName+' ['+(currBook.currFile+1)+'/'+currBook.fileArr.length+']');
@@ -342,6 +347,8 @@ function locateTest(){
 	}catch(e){
 		pd('e','@pic.js > locateTest > ERROR:'+e.message);
 	}
+	//swal('Sweet Alert test');
+	SW("test",'something line1\nline2');
 
 }
 function onKeydownEvent(key){
@@ -353,6 +360,10 @@ function onKeydownEvent(key){
 			break;
 		case 40:
 			//down
+			nextPage();
+			break;
+		case 32:
+			//space
 			nextPage();
 			break;
 		case 37:
