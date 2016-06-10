@@ -169,7 +169,7 @@ function showImg(){
 		startTime=0;
 	});
 	$('#pic-filter').append(img);
-
+	//test for revert
 }
 function prevBook(){
 	pd(I,"@pic.js > preBook start");
