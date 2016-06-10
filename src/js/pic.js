@@ -137,15 +137,15 @@ function showImg(){
 	if(typeof(currBook)==='undefined' || typeof(currBook.currFile) === 'undefined')
 		return;
 	startTime = new Date().getTime();
-	$('#pic-filter').empty();
-	pd(I,"@pic.js >> showImg, empty");
+	//$('#pic-filter').empty();
+	//pd(I,"@pic.js >> showImg, empty");
 	let imgPath=mergePath(currBook.dirPath,currBook.fileArr[currBook.currFile]);
 	
 	pd(I,"@pic.js >> showImg, img path="+imgPath);
 	let imgstr="<img src='"+winPath2FileURL(imgPath)+"'>";
-	pd(I,"@pic.js >> showImg, imgstr="+imgstr);
+	//pd(I,"@pic.js >> showImg, imgstr="+imgstr);
 	let img=$(imgstr);
-	pd(I,"@pic.js >> showImg, create img elem");
+	pd(I,"@pic.js >> showImg, create img elem, loading...");
 	img.css('display','none');
 	img.load(function(event){
 		let uTime = new Date().getTime() - startTime;
@@ -157,14 +157,17 @@ function showImg(){
 		let imgH = this.naturalHeight;
 		let imgW = this.naturalWidth;
 		let elem=$(this);
-		pd(I,"@pic.js >> showImg, get elem, W="+imgW+", H="+imgH);
+		pd(I,"@pic.js >> showImg, image W="+imgW+", H="+imgH);
 		let tmp =filterW-(imgW*(filterH/imgH));
 		if(tmp>0){
 			elem.css('height','100%');
 		}else{
 			elem.css('width','100%');
 		}
+		
+		$('[data-img-shown]').remove();
 		elem.css('display','initial');
+		elem.attr('data-img-shown','true');
 		$('#uTime').text(uTime+'ms');
 		startTime=0;
 	});
