@@ -18,7 +18,7 @@
 		<div style='height:100%;width:100%'>
 			<div style='height:20px;width:100%; margin-top: 5px;margin-bottom: 5px'>
 				<span id="info" style="width:65%; display: inline-block; border: 1px solid black; margin-left: 5px; padding-left:3px;">info</span>
-				<span class='span-btn' onclick="ipc.send('open-file-dialog');" >OpenDir</span>
+				<span class='span-btn' onclick="openDirClick();" >OpenDir</span>
 				<span class='span-btn' onclick='changeWorkingMode("pic");'>ViewPic</span>
 				<span class='span-btn' onclick='changeWorkingMode("rename");'>Rename</span>
 			</div>
@@ -36,16 +36,17 @@
 	<script>
 		//variable
 		var gDir;
+		var openDirDialog=false;
 		var workingMode="pic";
 	</script>
 	<script>
 		//events
 		$(document).ready(function(){
-			pd(I,"@index.html >> document ready");
+			//pd(I,"@index.html >> document ready");
 			changeWorkingMode("pic");
 		});
 		$(window).resize(function() {
-			pd(I,"@index.html >> window resize");
+			//pd(I,"@index.html >> window resize");
 			try{
 				onWindowResize();
 			}catch(e){}
@@ -68,10 +69,20 @@
 			pd(I,"path="+path[0]);
 			let dirData = readDir(path[0]);
 			dirOpened(dirData);
+			openDirDialog=false;
 		});
 	</script>
 	<script>
 		//functions
+		function openDirClick(){
+			if(openDirDialog)
+			{
+				pd(I,'@index.html > openDirClick; dialog is opened');
+				return;
+			}
+			openDirDialog=true;
+			ipc.send('open-file-dialog');
+		}
 		function changeWorkingMode(mode){
 			// pd(I,"clicked mode="+mode);
 			// pd(I,"workingMode="+workingMode);
