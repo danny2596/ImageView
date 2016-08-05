@@ -3,6 +3,7 @@ var startTime=0;
 var filterH,filterW;
 var openMode=0;//openMode: 0=>Open Root dir or book; 1=>move target 1; 2=>move target 2; 3=>move target 3;
 var moveTarget=[];
+var backup;
 function onInit(){
 	onWindowResize();
 }
@@ -17,6 +18,8 @@ function dirOpened(obj){
 	}
 	if(openMode===0)
 		openRootDir(dir);
+	else if(openMode===-1)
+		openBackupDir(dir);
 	else
 		openMoveTarget(dir,openMode);
 
@@ -129,10 +132,10 @@ function openBook(dir){
 }
 function showImg(){
 	pd(I,"@pic.js >> showImg, start");
-	if(startTime!==0){
-		pd(I,"@pic.js >> showImg, startTime="+startTime+", return");
-		return;
-	}
+	// if(startTime!==0){
+	// 	pd(I,"@pic.js >> showImg, startTime="+startTime+", return");
+	// 	return;
+	// }
 
 	if(typeof(currBook)==='undefined' || typeof(currBook.currFile) === 'undefined')
 		return;
@@ -145,18 +148,17 @@ function showImg(){
 	let imgstr="<img src='"+winPath2FileURL(imgPath)+"'>";
 	//pd(I,"@pic.js >> showImg, imgstr="+imgstr);
 	let img=$(imgstr);
+	img.data("st",startTime);
+	img.data("idx",currBook.currFile);
 	pd(I,"@pic.js >> showImg, create img elem, loading...");
 	img.css('display','none');
+	$('#uTime').text("Loading...");
 	img.load(function(event){
-		let uTime = new Date().getTime() - startTime;
-		if(startTime !==0){
-			pd(I,"@pic.js >> showImg, img on load usage time = "+uTime+" ms");
-		}else{
-			pd(I,"@pic.js >> showImg, img on load ,startTime=0 something error");
-		}
+		let elem=$(this);
+		
 		let imgH = this.naturalHeight;
 		let imgW = this.naturalWidth;
-		let elem=$(this);
+		
 		pd(I,"@pic.js >> showImg, image W="+imgW+", H="+imgH);
 		let tmp =filterW-(imgW*(filterH/imgH));
 		if(tmp>0){
@@ -164,10 +166,20 @@ function showImg(){
 		}else{
 			elem.css('width','100%');
 		}
-		
-		$('[data-img-shown]').remove();
-		elem.css('display','initial');
+
+		if(currBook.currFile === elem.data("idx")){
+			$('[data-img-shown]').remove();
+			elem.css('display','initial');
+		}
 		elem.attr('data-img-shown','true');
+			
+		
+		let uTime = new Date().getTime() - elem.data("st");
+		if(startTime !==0){
+			pd(I,"@pic.js >> showImg, img on load usage time = "+uTime+" ms");
+		}else{
+			pd(I,"@pic.js >> showImg, img on load ,startTime=0 something error");
+		}
 		$('#uTime').text(uTime+'ms');
 		startTime=0;
 	});
@@ -254,18 +266,57 @@ function lastPage(){
 	showImg();
 }
 function deletePage(){
-	//copy src path and name
+	if(typeof(currBook)==='undefined' || typeof(currBook.currFile) === 'undefined')
+		return;
+	
+	let name = currBook.fileArr[currBook.currFile];
+	if(!moveFile(name)){
+		return;
+	}
 	
 	//remove name form currBook.fileArr
+	currBook.fileArr.splice(currBook.currFile,1);
 	
 	//check currfile is out of range or not
+	if(currBook.currFile===currBook.fileArr.length){
+		currBook.currFile--;
+	}
+	if(currBook.currFile===-1){
+		alert('No more Page');
+		return;
+	}
+	try{
+		showImg();	
+	}catch(e){
+		pd("e","showImage failed");
+	}
 	
-	//showImage()
-	
-	// process backup name
-	
-	//use fs move file to back dir
-	
+}
+function moveFile(name){
+	if(typeof(name) !== 'string')
+		return false;
+	// check backup dir is set or not
+	if(typeof(backup)==='undefined' || backup.length===0){
+		openMode=-1;
+		ipc.send('open-file-dialog');
+		return false;
+	}
+	let src = mergePath(currBook.dirPath,name);
+	let bookName=getName(currBook.dirPath);
+
+	//process backup name
+	if(bookName.length>20){
+		bookName=bookName.substring(0,20)+'~';
+	}
+	pd(I,"bookname="+bookName);
+	let dst = mergePath(backup,bookName+'_'+name);
+
+	//check state
+	if(checkStatus(dst)!==NOT_EXISTS)
+		return false;
+
+	moveDirOrFile(src,dst);
+	return true;
 }
 function moveBook(target){
 	if(typeof(moveTarget[target]) !== 'string' ||moveTarget[target].length===0 ){
@@ -319,7 +370,7 @@ function moveBook(target){
 	
 	
 	//use fs rename to target
-	moveDir(srcPath,dstPath);
+	moveDirOrFile(srcPath,dstPath);
 
 	if(gDir.currDir === -1)
 	{
@@ -332,11 +383,18 @@ function askTargetDirPath(mode){
 	openMode=mode;
 	ipc.send('open-file-dialog');
 }
+function openBackupDir(dir){
+	let path = dir.dirPath;
+	if(path[path.length-1]==='\\')
+		backup=path;
+	else
+		backup=path+'\\';
+}
 function openMoveTarget(dir,mode){
 	//getted target dir
 	//save path.
 	let path = dir.dirPath;
-	pd(I,'@pic.js > locateTest > path:'+path);
+	//pd(I,'@pic.js > locateTest > path:'+path);
 	if(path[path.length-1]==='\\')
 		moveTarget[mode]=path;
 	else
