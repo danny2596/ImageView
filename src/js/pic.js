@@ -153,6 +153,7 @@ function showImg(){
 	pd(I,"@pic.js >> showImg, create img elem, loading...");
 	img.css('display','none');
 	$('#uTime').text("Loading...");
+	$('#info').css('background-color', '#E6CAFF');
 	img.load(function(event){
 		let elem=$(this);
 		
@@ -181,6 +182,7 @@ function showImg(){
 			pd(I,"@pic.js >> showImg, img on load ,startTime=0 something error");
 		}
 		$('#uTime').text(uTime+'ms');
+		$('#info').css('background-color', '#ffffff');
 		startTime=0;
 	});
 	$('#pic-filter').append(img);
@@ -312,8 +314,15 @@ function moveFile(name){
 	let dst = mergePath(backup,bookName+'_'+name);
 
 	//check state
-	if(checkStatus(dst)!==NOT_EXISTS)
-		return false;
+	if(checkStatus(dst)!==NOT_EXISTS){
+		let nameCount=0;
+		do{
+			if(nameCount===100)
+				return false;
+			nameCount++;
+			dst = mergePath(backup,bookName+'_'+nameCount+'_'+name);
+		}while(checkStatus(dst)!==NOT_EXISTS);
+	}
 
 	moveDirOrFile(src,dst);
 	return true;

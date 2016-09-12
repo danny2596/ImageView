@@ -49,7 +49,7 @@ function readDir(path){
 			pd('e',"@processFile.js > readDir, process "+fullPath+' error:'+e.message)
 		}
 	}
-	files.dirArr.alphanumSort();
+	//files.dirArr.alphanumSort();
 	files.fileArr.alphanumSort();
 	return files;
 }
