@@ -50,6 +50,9 @@ function readDir(path){
 		}
 	}
 	//files.dirArr.alphanumSort();
+	files.dirArr.sort(function(p1,p2){
+		return p1.localeCompare(p2);
+	});
 	files.fileArr.alphanumSort();
 	return files;
 }
