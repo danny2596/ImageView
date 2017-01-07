@@ -57,6 +57,54 @@ function readDir(path){
 	return files;
 }
 
+function checkConfig(){
+	let config = "config.json";
+	try{
+		if(fs.existsSync(config))
+		{
+			pd("config exist read config");
+			let configObj = fs.readJsonSync(config);
+			console.dir(configObj);
+			if(configObj){
+				if(configObj.moveTarget && $.isArray(configObj.moveTarget)){
+					for(let i =0;i<4;i++){
+						let tDir=configObj.moveTarget[i];
+						moveTarget[i] = "";
+						if(checkStatus(tDir) == DIRECTROY){
+							moveTarget[i] = configObj.moveTarget[i];
+						}
+					}
+				}
+				if(configObj.delPic && configObj.delPic.length != 0 && checkStatus(configObj.delPic) == DIRECTROY){
+					backup = configObj.delPic;
+				}else
+				{
+					SW("Config", "delPic is null");
+					backup = "";
+				}
+			}
+
+			pd("print moveTarget");
+			console.dir(moveTarget);
+			console.log("backup="+backup)
+		}else{
+			pd("config not EXIST create a config file");
+			let obj={};
+			obj.moveTarget = [];
+			obj.moveTarget[0]="";
+			obj.moveTarget[1]="";
+			obj.moveTarget[2]="";
+			obj.moveTarget[3]="";
+			obj.delPic="";
+			fs.outputJsonSync(config,obj);
+		}
+	}catch(e){
+		pd("e","@processFile.js >> checkConfig error:"+e.message);
+	}
+	
+}
+
+
 function winPath2FileURL(path){
 	if(typeof(path)!=='string')
 		return "";
