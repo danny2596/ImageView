@@ -3,17 +3,14 @@ var startTime=0;
 var filterH,filterW;
 var openMode=0;//openMode: 0=>Open Root dir or book; 1=>move target 1; 2=>move target 2; 3=>move target 3;
 var moveTarget=[];
-
-var backup = "";
+var backup = "E:\\二次元\\(05)月打包-待整理\\(00)棄_pic";
 moveTarget[0] = "";
-moveTarget[1] = "";
-moveTarget[2] = "";
-moveTarget[3] = "";
+moveTarget[1] = "E:\\二次元\\(05)月打包-待整理\\(00)棄";
+moveTarget[2] = "E:\\二次元\\(05)月打包-待整理\\(00)全年齡";
+moveTarget[3] = "E:\\二次元\\(05)月打包-待整理\\(00)重複";
 
 function onInit(){
 	onWindowResize();
-	checkConfig();
-	initInfoBar();
 }
 function dirOpened(obj){
 	if(obj === undefined){
@@ -24,11 +21,8 @@ function dirOpened(obj){
 	}else{
 		dir=obj;
 	}
-	if(openMode===0){
-		let book = openRootDir(dir);
-		if(book != null)
-			openBook(book);
-	}
+	if(openMode===0)
+		openRootDir(dir);
 	else if(openMode===-1)
 		openBackupDir(dir);
 	else
@@ -60,87 +54,45 @@ function openRootDir(obj){
 			let bookPath=mergePath(dir.dirPath,dir.dirArr[0]);
 			dir.currDir=0;
 			gDir=dir;
-			return readDir(bookPath);
+			let book = readDir(bookPath);
+			openBook(book);
 		}else if(dir.fileArr.length>0){
 			//get parent dir
 			let parentPath = getParentPath(dir.dirPath);
 			if(parentPath==null)
-				return null;
+				return;
 			//set up gDir
 			gDir = readDir(parentPath);
 			let idx = gDir.dirArr.indexOf(getName(dir.dirPath));
 			gDir.currDir=idx;
-			return dir;
+			//openBook
+			openBook(dir);
 		}
 	}catch(e){
 		pd('e',"@pic.js > openRootDir > open book ERROR : "+e.message);
 	}
-	return null;
 }
-function initInfoBar(){
-	let info = $('#info');
-	info.empty();
-
-	let alpha=$("<div class='alpha' id='alpha'>Alpha</div>");
-	alpha.hide();
-	info.append(alpha);
-
-	let subdir = $("<div class='subdir' id='subdir'>SubDIR</div>");
-	subdir.hide();
-	info.append(subdir);
-
-	let nonImg = $("<div class='non-img' id='nonImg'>NonImg</dev>");
-	nonImg.hide();
-	info.append(nonImg);
-
-	let bookinfo = $('<div class="bookinfo" id="book-info"></div>');
-	info.append(bookinfo);
-
-	let uTime = $('<div class="rightCell" id="uTime"></div>');
-	info.append(uTime);
-
-	let bookIndex = $('<div class="rightCell" id="bookIndex"></div>');
-	info.append(bookIndex);
-
-	let pageIndex = $('<div class="rightCell" id="pageIndex"></div>');
-	info.append(pageIndex);
-
-	
-
-}
-function check_gDir(){
-	if(typeof(gDir)==='undefined')
-		return false;
-
-	return true;
-}
-
 function openBook(dir){
 	let msg = [];
 	let bookName=getName(dir.dirPath);
 	let info = $('#info');
+
 	currBook=dir;
-	if(!check_gDir()){
-		return;
-	}
-	$("#bookIndex").text("Book "+(gDir.currDir+1)+"/"+gDir.dirArr.length);
+	info.empty();
 	
 	// check is nature sort
 	let tmp = dir.fileArr.slice(0);
 	tmp.sort();
 	if(!stringArrayCmp(tmp,dir.fileArr)){
-		$('#alpha').show();
+		let alpha=$("<div class='alpha'>Alpha</div>");
+		info.append(alpha);
 		msg.push("Using Alpha Sort");
-	}else{
-		$('#alpha').hide();
 	}
 		
 	// check has dir insite
 	if(dir.dirArr.length>0){
-		$('#subdir').show();
+		let subdir = $("<div class='subdir'>SubDIR</div>");
 		msg.push("Has Sub-Directory");
-	}else{
-		$('#subdir').hide();
 	}
 
 	// remove non-image file
@@ -158,21 +110,19 @@ function openBook(dir){
 	dir.fileArr=imgOnly;
 	dir.imgArr=imgOnly;
 	if(hasNonImg){
-		$('#nonImg').show();
+		let nonImg = $("<div class='non-img'>NonImg</dev>");
+		info.append(nonImg);
 		msg.push("Has Non-image file");
-	}else{
-		$('#nonImg').hide();
 	}
 
 	// put book info
 	if(dir.fileArr.length===0){
-		$("#book-info").text("NO Image CAN SHOW in "+bookName);
+		info.append('<div class="bookinfo" id="book-info">NO IMAGE CAN SHOW '+bookName+'</div>');
 	}
 	else{
 		currBook.bookName=bookName;
-		$("#book-info").text(bookName);
-		$("#pageIndex").text("Page 1/"+currBook.fileArr.length);
-
+		info.append('<div class="bookinfo" id="book-info">'+bookName+' [1/'+dir.fileArr.length+']</div>');
+		info.append('<div class="bookinfo" id="uTime"></div>');
 	}	
 
 	//show image
@@ -287,7 +237,7 @@ function prevPage(){
 		SW('No Prev Page');
 		return;
 	}
-	$('#pageIndex').text('Page '+(currBook.currFile+1)+'/'+currBook.fileArr.length);
+	$('#book-info').text(currBook.bookName+' ['+(currBook.currFile+1)+'/'+currBook.fileArr.length+']');
 	showImg();
 
 
@@ -303,7 +253,7 @@ function nextPage(){
 		SW('No Next Page');
 		return;
 	}
-	$('#pageIndex').text('Page '+(currBook.currFile+1)+'/'+currBook.fileArr.length);
+	$('#book-info').text(currBook.bookName+' ['+(currBook.currFile+1)+'/'+currBook.fileArr.length+']');
 	showImg();
 }
 function firstPage(){
@@ -311,7 +261,7 @@ function firstPage(){
 	if(typeof(currBook)==='undefined' || typeof(currBook.currFile) === 'undefined')
 		return;
 	currBook.currFile=0;
-	$('#pageIndex').text('Page '+(currBook.currFile+1)+'/'+currBook.fileArr.length);
+	$('#book-info').text(currBook.bookName+' ['+(currBook.currFile+1)+'/'+currBook.fileArr.length+']');
 	showImg();
 }
 function lastPage(){
@@ -319,20 +269,14 @@ function lastPage(){
 	if(typeof(currBook)==='undefined' || typeof(currBook.currFile) === 'undefined')
 		return;
 	currBook.currFile=currBook.fileArr.length-1;
-	$('#pageIndex').text('Page '+(currBook.currFile+1)+'/'+currBook.fileArr.length);
+	$('#book-info').text(currBook.bookName+' ['+(currBook.currFile+1)+'/'+currBook.fileArr.length+']');
 	showImg();
 }
 function deletePage(){
 	if(typeof(currBook)==='undefined' || typeof(currBook.currFile) === 'undefined')
 		return;
-
+	
 	let name = currBook.fileArr[currBook.currFile];
-
-	if(!confirm("Do you want move ["+name+"] to "+backup+'?')){
-		return;
-	}
-
-	//remove file
 	if(!moveFile(name)){
 		return;
 	}
@@ -499,17 +443,15 @@ function onKeydownEvent(key){
 			break;
 		case 37:
 			//left
-			checkConfig();
+			locateTest();
 			break;
 		case 39:
 			//right
 			break;
-		case 83: //s
 		case 219:
 			//[
 			prevBook();
 			break;
-		case 68: //d
 		case 221:
 			//]
 			nextBook();

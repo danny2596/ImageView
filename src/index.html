@@ -66,19 +66,11 @@
 		// about open dir
 		const ipc = require('electron').ipcRenderer;
 		ipc.on('selected-directory', function (event, path) {
-			//`pd(I,"path="+path[0]);
+			pd(I,"path="+path[0]);
 			let dirData = readDir(path[0]);
 			dirOpened(dirData);
 			openDirDialog=false;
 		});
-		//nothing-selected
-		ipc.on('nothing-selected',function(event){
-			//pd(I,"nothing-selected");
-			openDirDialog=false;
-		})
-		ipc.on('print-msg',function(event,msg){
-			pd(I,"MGS : "+msg);
-		})
 	</script>
 	<script>
 		//functions
