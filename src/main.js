@@ -21,6 +21,12 @@ function createWindow () {
 	mainWindow.show();
 }
 
+function printMessage(msg){
+	if(mainWindow){
+		mainWindow.webContents.send('print-msg',msg);
+	}
+}
+
 
 //add app events
 app.on('ready', createWindow);
@@ -42,7 +48,11 @@ ipc.on('open-file-dialog', function (event) {
 	dialog.showOpenDialog(
 		{properties: ['openDirectory']}, 
 		function (files) {
-			if (files) event.sender.send('selected-directory', files)
+			if (files){
+				event.sender.send('selected-directory', files)	
+			}else{
+				event.sender.send('nothing-selected');
+			}
 		}
 	);
 });

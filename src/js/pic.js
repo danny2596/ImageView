@@ -3,14 +3,15 @@ var startTime=0;
 var filterH,filterW;
 var openMode=0;//openMode: 0=>Open Root dir or book; 1=>move target 1; 2=>move target 2; 3=>move target 3;
 var moveTarget=[];
-var backup = "E:\\二次元\\(05)月打包-待整理\\(00)棄_pic";
+var backup = "";
 moveTarget[0] = "";
-moveTarget[1] = "E:\\二次元\\(05)月打包-待整理\\(00)棄";
-moveTarget[2] = "E:\\二次元\\(05)月打包-待整理\\(00)全年齡";
-moveTarget[3] = "E:\\二次元\\(05)月打包-待整理\\(00)重複";
+moveTarget[1] = "";
+moveTarget[2] = "";
+moveTarget[3] = "";
 
 function onInit(){
 	onWindowResize();
+	checkConfig();
 }
 function dirOpened(obj){
 	if(obj === undefined){
