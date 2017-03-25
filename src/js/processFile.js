@@ -50,11 +50,75 @@ function readDir(path){
 		}
 	}
 	//files.dirArr.alphanumSort();
-	files.dirArr.sort(function(p1,p2){
-		return p1.localeCompare(p2);
-	});
+	
+	//files.dirArr.sort(function(p1,p2){
+	//	return p1.localeCompare(p2);
+	//});
+	files.dirArr.sort(stringCompare);
 	files.fileArr.alphanumSort();
 	return files;
+}
+
+function printInUnicode(str){
+	let i=0;
+	let uniArr=[];
+	pd(I,"-----------------------------");
+	for(i=0;i<str.length;i++){
+		uniArr.push(str.charCodeAt(i));
+	}
+	pd(I,"in uni="+uniArr);
+}
+
+function typeOfCharInUnicode(code){
+	let hiragana_first = "ぁ";
+	let katakana_last = "ヿ";
+	let hf = hiragana_first.charCodeAt(0);
+	let kl = katakana_last.charCodeAt(0);
+	//pd(I,"hf = "+hf+", kl = "+kl);
+
+	if(code < hf){
+		//pd("before haiagana");		
+		return 0;
+	}else if(code <= kl){
+		//pd("katakana or hiragana");
+		return 1;
+	}else{
+		//pd("afer kana");
+		return 2;
+	}
+}
+function stringCompare(p1,p2){
+	let l1,l2,size,i,c1,c2;
+	l1 = p1.length;
+	l2 = p2.length;
+	if(l1>l2)
+		size = l2;
+	else
+		size=l1;
+
+	for(i=0;i<size;i++){
+		c1=p1.charCodeAt(i);
+		c2=p2.charCodeAt(i);
+		if(c1!=c2)
+			break;
+	}
+	if(c1!=c2){
+		let ty1 = typeOfCharInUnicode(c1);
+		let ty2 = typeOfCharInUnicode(c2);
+		if(ty1 == ty2){
+			return p1.localeCompare(p2);
+		}else if(ty1 > ty2){
+			return 1;
+		}else{
+			return -1;
+		}
+	}
+	else
+	{
+		return p1.localeCompare(p2);
+	}
+	return p1.localeCompare(p2);
+
 }
 
 function checkConfig(){

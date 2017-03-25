@@ -32,7 +32,7 @@ function pd(p1,p2,p3) //print debug
 			console.log(msg);
 		}
 		else{
-			console.log(msg);
+			console.dir(msg);
 		}
 	}
 }
