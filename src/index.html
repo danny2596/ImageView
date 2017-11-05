@@ -16,7 +16,7 @@
 	</style>
 	<body style='height:100%;width:100%; margin:0 0 0 0;'>
 		<div style='height:100%;width:100%'>
-			<div style='height:20px;width:100%; margin-top: 5px;margin-bottom: 5px'>
+			<div id="top-bar" style='height:20px;width:100%; margin-top: 5px;margin-bottom: 5px'>
 				<span id="info" style="width:65%; display: inline-block; border: 1px solid black; margin-left: 5px; padding-left:3px;">info</span>
 				<span class='span-btn' onclick="openDirClick();" >OpenDir</span>
 				<span class='span-btn' onclick='changeWorkingMode("pic");'>ViewPic</span>
@@ -52,7 +52,7 @@
 			}catch(e){}
 		});
 		$(document).on('keydown', function (event) {
-			pd(I,"@index.html > keydown fired, keycode="+event.keyCode);
+			// pd(I,"@index.html > keydown fired, keycode="+event.keyCode);
 			try{
 				if(event.keyCode==67){
 					//key 'C'

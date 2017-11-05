@@ -17,6 +17,7 @@ function onInit(){
 	checkConfig();
 	initInfoBar();
 }
+
 function onWindowResize(){
 	// pd(I,"@pic.js >> onWindowResize Start");
 	let winH= window.innerHeight;
@@ -24,12 +25,15 @@ function onWindowResize(){
 	filterH = winH-30;
 	filterW=winW;
 	$('.pic-filter').css('height',filterH);
+	$('#file-management').css('height',winH);
 	showImg();
 	// pd(I,"@pic.js >> onWindowResize end");
 }
+
 function onDestroy(){
 
 }
+
 function initInfoBar(){
 	let info = $('#info');
 	info.empty();
@@ -57,10 +61,8 @@ function initInfoBar(){
 
 	let pageIndex = $('<div class="rightCell" id="pageIndex"></div>');
 	info.append(pageIndex);
-
-	
-
 }
+
 function askTargetDirPath(mode){
 	if(openMode!==0)
 		return;
@@ -75,6 +77,7 @@ function openBackupDir(dir){
 	else
 		backup=path+'\\';
 }
+
 function openMoveTarget(dir,mode){
 	//getted target dir
 	//save path.
@@ -98,6 +101,7 @@ function locateTest(){
 	SW("test",'something line1\nline2');
 
 }
+
 function onKeydownEvent(key){
 	
 	switch(key){
@@ -115,7 +119,8 @@ function onKeydownEvent(key){
 			break;
 		case 37:
 			//left
-			locateTest();
+			// deleteNonImageFiles();
+			fixAlphaSort();
 			break;
 		case 39:
 			//right
@@ -180,6 +185,8 @@ function onKeydownEvent(key){
 			break;
 	}
 }//end of onKeydownEvent
+
+
 ////////////////////////////////////////////////////////////////////////////////////////
 ///             book control                                                        ////
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -189,7 +196,6 @@ function check_gDir(){
 
 	return true;
 }
-
 
 function dirOpened(obj){
 	if(obj === undefined){
@@ -239,8 +245,6 @@ function openRootDir(obj){
 		pd('e',"@pic.js > openRootDir > open book ERROR : "+e.message);
 	}
 }
-
-
 
 function openBook(dir){
 	let msg = [];
@@ -312,8 +316,9 @@ function openBook(dir){
 		SW('Book',msg.join('\n'));
 	}
 }
+
 function prevBook(){
-	pd(I,"@pic.js > preBook start");
+	// pd(I,"@pic.js > preBook start");
 	if(typeof(gDir)==='undefined' || typeof(gDir.currDir) === 'undefined')
 	{
 		pd(I,'@pic.js > prebook ; gDir or gDir.currDir is undefined')
@@ -325,11 +330,12 @@ function prevBook(){
 	}
 	gDir.currDir--;
 	let bookPath =mergePath(gDir.dirPath,gDir.dirArr[gDir.currDir]);
-	pd(I,'@pic.js > prevBook ; bookPath = '+bookPath);
+	// pd(I,'@pic.js > prevBook ; bookPath = '+bookPath);
 	openBook(readDir(bookPath));
 }
+
 function nextBook(){
-	pd(I,"@pic.js > nextBook start");
+	// pd(I,"@pic.js > nextBook start");
 	if(typeof(gDir)==='undefined' || typeof(gDir.currDir) === 'undefined')
 	{
 		pd(I,'@pic.js > nextBook ; gDir or gDir.currDir is undefined')
@@ -342,9 +348,10 @@ function nextBook(){
 	}
 	gDir.currDir++;
 	let bookPath = mergePath(gDir.dirPath,gDir.dirArr[gDir.currDir]);
-	pd(I,'@pic.js > nextBook ; bookPath = '+bookPath);
+	// pd(I,'@pic.js > nextBook ; bookPath = '+bookPath);
 	openBook(readDir(bookPath));
 }
+
 function moveBook(target){
 	if(typeof(moveTarget[target]) !== 'string' ||moveTarget[target].length===0 ){
 		pd(I,'@pic.js > moveBook; return, typeof(moveTarget[target])='+typeof(moveTarget[target]));
@@ -404,11 +411,12 @@ function moveBook(target){
 		alert('No more Book');
 	}
 }
+
 ////////////////////////////////////////////////////////////////////////////////////////
 ///             book page control                                                   ////
 ////////////////////////////////////////////////////////////////////////////////////////
 function showImg(){
-	pd(I,"@pic.js >> showImg, start");
+	// pd(I,"@pic.js >> showImg, start");
 	// if(startTime!==0){
 	// 	pd(I,"@pic.js >> showImg, startTime="+startTime+", return");
 	// 	return;
@@ -421,13 +429,13 @@ function showImg(){
 	//pd(I,"@pic.js >> showImg, empty");
 	let imgPath=mergePath(currBook.dirPath,currBook.fileArr[currBook.currFile]);
 	
-	pd(I,"@pic.js >> showImg, img path="+imgPath);
+	// pd(I,"@pic.js >> showImg, img path="+imgPath);
 	let imgstr="<img src='"+winPath2FileURL(imgPath)+"'>";
 	//pd(I,"@pic.js >> showImg, imgstr="+imgstr);
 	let img=$(imgstr);
 	img.data("st",startTime);
 	img.data("idx",currBook.currFile);
-	pd(I,"@pic.js >> showImg, create img elem, loading...");
+	// pd(I,"@pic.js >> showImg, create img elem, loading...");
 	img.css('display','none');
 	$('#uTime').text("Loading...");
 	$('#info').css('background-color', '#E6CAFF');
@@ -437,7 +445,7 @@ function showImg(){
 		let imgH = this.naturalHeight;
 		let imgW = this.naturalWidth;
 		
-		pd(I,"@pic.js >> showImg, image W="+imgW+", H="+imgH);
+		// pd(I,"@pic.js >> showImg, image W="+imgW+", H="+imgH);
 		let tmp =filterW-(imgW*(filterH/imgH));
 		if(tmp>0){
 			elem.css('height','100%');
@@ -454,7 +462,7 @@ function showImg(){
 		
 		let uTime = new Date().getTime() - elem.data("st");
 		if(startTime !==0){
-			pd(I,"@pic.js >> showImg, img on load usage time = "+uTime+" ms");
+			// pd(I,"@pic.js >> showImg, img on load usage time = "+uTime+" ms");
 		}else{
 			pd(I,"@pic.js >> showImg, img on load ,startTime=0 something error");
 		}
@@ -466,9 +474,8 @@ function showImg(){
 
 }
 
-
 function prevPage(){
-	pd(I,"@pic.js > prevPage start");
+	// pd(I,"@pic.js > prevPage start");
 	if(typeof(currBook)==='undefined' || typeof(currBook.currFile) === 'undefined')
 		return;
 	currBook.currFile--;
@@ -483,8 +490,9 @@ function prevPage(){
 
 
 }
+
 function nextPage(){
-	pd(I,"@pic.js > nextPage start");
+	// pd(I,"@pic.js > nextPage start");
 	if(typeof(currBook)==='undefined' || typeof(currBook.currFile) === 'undefined')
 		return;
 	currBook.currFile++;
@@ -497,22 +505,25 @@ function nextPage(){
 	$('#pageIndex').text('Page '+(currBook.currFile+1)+'/'+currBook.fileArr.length);
 	showImg();
 }
+
 function firstPage(){
-	pd(I,"@pic.js > firstPage start");
+	// pd(I,"@pic.js > firstPage start");
 	if(typeof(currBook)==='undefined' || typeof(currBook.currFile) === 'undefined')
 		return;
 	currBook.currFile=0;
 	$('#pageIndex').text('Page '+(currBook.currFile+1)+'/'+currBook.fileArr.length);
 	showImg();
 }
+
 function lastPage(){
-	pd(I,"@pic.js > lastPage start");
+	// pd(I,"@pic.js > lastPage start");
 	if(typeof(currBook)==='undefined' || typeof(currBook.currFile) === 'undefined')
 		return;
 	currBook.currFile=currBook.fileArr.length-1;
 	$('#pageIndex').text('Page '+(currBook.currFile+1)+'/'+currBook.fileArr.length);
 	showImg();
 }
+
 function deletePage(){
 	if(typeof(currBook)==='undefined' || typeof(currBook.currFile) === 'undefined')
 		return;
@@ -546,6 +557,7 @@ function deletePage(){
 	}
 	
 }
+
 function moveFile(name){
 	if(typeof(name) !== 'string')
 		return false;
@@ -578,4 +590,91 @@ function moveFile(name){
 
 	moveDirOrFile(src,dst);
 	return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+///             problem fix (alpha sort, non image file)                            ////
+////////////////////////////////////////////////////////////////////////////////////////
+
+function deleteNonImageFiles(){
+	// show another images
+	// hide top-bar, and pic
+	$('#pic-filter').hide();
+	$('#top-bar').hide();
+	$('#file-management').show();
+	// create table in list-table
+	createTable('nonImg');
+}
+
+function fixAlphaSort(){
+	// show another images
+	// hide top-bar, and pic
+	$('#pic-filter').hide();
+	$('#top-bar').hide();
+	$('#file-management').show();
+	// create table in list-table
+	createTable('alpha');
+	showTableRows('alpha');
+}
+
+function backToShowImage(){
+	$('#pic-filter').show();
+	$('#top-bar').show();
+	$('#file-management').hide();
+	$("#list-table").empty();
+}
+
+function fileManagementApply(){
+	pd("fileManagementApply start");
+
+	backToShowImage();
+	pd("fileManagementApply end");
+}
+
+function fileManagementCancel(){
+	pd("fileManagementCancel start");
+
+	backToShowImage();
+	pd("fileManagementCancel end");
+}
+
+function createTable(type){
+	let simpleTable = "";
+	if(type == 'nonImg'){
+		// delete non image files
+		simpleTable = 
+		"<table class='fm-table'>\
+			<thead>\
+				<tr>\
+					<th>delete</th>\
+					<th>file name</th>\
+				</tr>\
+			</thead>\
+			<tbody id='data-table'></tbody>\
+		</table>";
+	}else{
+		// alpha sort
+		simpleTable = "<table class='fm-table' id='tooltable'><tbody></tbody></table>";
+		simpleTable += 
+		"<table class='fm-table'>\
+			<thead>\
+				<tr>\
+					<th>rename</th>\
+					<th>review</th>\
+				</tr>\
+			</thead>\
+			<tbody id='data-table'></tbody>\
+		</table>"
+	}
+	$('#list-table').append(simpleTable);
+}
+function showTableRows(type){
+	if(type == 'alpha'){
+		pd("called by fix alpha sort");
+	}
+	//get file list
+	pd('print obj currBook');
+	pd(currBook);
+	//compare common sort and alpha sort
+	//
 }

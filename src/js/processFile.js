@@ -122,11 +122,33 @@ function stringCompare(p1,p2){
 }
 
 function checkConfig(){
-	let config = "config.json";
+	let config;
 	try{
+		let current_path = process.cwd();
+		pd(I,current_path);
+		config = mergePath(current_path, "config.json");
+	}catch(e){
+		console.log("Error XXX");
+		config = "./config.json";
+	}
+	
+	
+	//let config = "./config.json";
+	try{
+		console.log("check file : "+config);
 		if(fs.existsSync(config))
 		{
-			pd("config exist read config");
+			pd("config exist read config ==> print config file");
+			//print config
+			
+			// fs.readFileSync(config).toString().split('\n').forEach(function (line) { 
+			// 	console.log(line);
+			// });
+			let configText = fs.readFileSync(config).toString();
+			console.log(configText);
+			
+			pd("prase json by readJsonSync");	
+			//use readJsonSync
 			let configObj = fs.readJsonSync(config);
 			console.dir(configObj);
 			if(configObj){
